@@ -1,163 +1,176 @@
 import React from 'react'
 
-// Mascot moods map to different expressions
-export default function Mascot({ size = 120, mood = 'happy', animate = true }) {
-  const floatAnim = animate ? { animation: 'mascotFloat 3s ease-in-out infinite' } : {}
-  const blinkAnim = animate ? { animation: 'mascotBlink 5s ease-in-out infinite' } : {}
+/**
+ * Mascot: Professor Fin — กันแว่นใส่ hoodie สีน้ำเงิน
+ * Moods: happy | thinking | loading | excited | sad | wink
+ */
+export default function Mascot({ size = 120, mood = 'happy', animate = true, color = '#2563EB' }) {
+  const floatStyle = animate ? { animation: 'float 3.2s ease-in-out infinite', display:'inline-block' } : { display:'inline-block' }
 
-  // Eyes based on mood
+  const blinkStyle = animate ? { animation: 'blink 5s ease-in-out infinite', transformOrigin:'center' } : {}
+
+  // Darken/lighten helpers
+  const hoodieColor  = color
+  const hoodieShade  = color + 'CC'   // slightly transparent shade
+
+  /* ── Eye expressions ── */
   const eyes = {
-    happy: (
-      <>
-        {/* Left eye - happy curved */}
-        <ellipse cx="34" cy="46" rx="5" ry="5.5" fill="#1a1a2e" />
-        <circle cx="36" cy="44" r="1.5" fill="white" />
-        {/* Right eye - winking */}
-        <path d="M52 44 Q56 42 60 44" stroke="#1a1a2e" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <path d="M52 46 Q56 44 60 46" stroke="#1a1a2e" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-      </>
-    ),
-    thinking: (
-      <>
-        <ellipse cx="34" cy="46" rx="5" ry="5.5" fill="#1a1a2e" />
-        <circle cx="36" cy="44" r="1.5" fill="white" />
-        <ellipse cx="56" cy="46" rx="5" ry="5.5" fill="#1a1a2e" />
-        <circle cx="58" cy="44" r="1.5" fill="white" />
-        {/* thought dots */}
-        <circle cx="72" cy="32" r="2" fill="#94a3b8" />
-        <circle cx="77" cy="26" r="2.5" fill="#94a3b8" />
-        <circle cx="83" cy="19" r="3.5" fill="#94a3b8" opacity="0.6" />
-      </>
-    ),
-    loading: (
-      <>
-        <ellipse cx="34" cy="46" rx="5" ry="3" fill="#1a1a2e" style={blinkAnim} />
-        <ellipse cx="56" cy="46" rx="5" ry="3" fill="#1a1a2e" style={blinkAnim} />
-      </>
-    ),
-    excited: (
-      <>
-        <ellipse cx="34" cy="46" rx="5.5" ry="6" fill="#1a1a2e" />
-        <circle cx="36.5" cy="43.5" r="2" fill="white" />
-        <ellipse cx="56" cy="46" rx="5.5" ry="6" fill="#1a1a2e" />
-        <circle cx="58.5" cy="43.5" r="2" fill="white" />
-        {/* sparkles */}
-        <text x="68" y="34" fontSize="8">✨</text>
-      </>
-    ),
-    sad: (
-      <>
-        <ellipse cx="34" cy="48" rx="5" ry="5.5" fill="#1a1a2e" />
-        <circle cx="36" cy="46" r="1.5" fill="white" />
-        <ellipse cx="56" cy="48" rx="5" ry="5.5" fill="#1a1a2e" />
-        <circle cx="58" cy="46" r="1.5" fill="white" />
-      </>
-    ),
+    happy: <>
+      <ellipse cx="35" cy="47" rx="5.5" ry="5.8" fill="#1C1B2E" style={blinkStyle}/>
+      <circle cx="37.5" cy="44.5" r="1.8" fill="white"/>
+      <ellipse cx="57" cy="47" rx="5.5" ry="5.8" fill="#1C1B2E" style={blinkStyle}/>
+      <circle cx="59.5" cy="44.5" r="1.8" fill="white"/>
+    </>,
+    wink: <>
+      <ellipse cx="35" cy="47" rx="5.5" ry="5.8" fill="#1C1B2E"/>
+      <circle cx="37.5" cy="44.5" r="1.8" fill="white"/>
+      {/* Right eye winking */}
+      <path d="M51 47 Q57 43 63 47" stroke="#1C1B2E" strokeWidth="2.8" fill="none" strokeLinecap="round"/>
+      <path d="M52 49 Q57 46 62 49" stroke="#1C1B2E" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.5"/>
+    </>,
+    thinking: <>
+      <ellipse cx="35" cy="47" rx="5.5" ry="5.8" fill="#1C1B2E"/>
+      <circle cx="37.5" cy="44.5" r="1.8" fill="white"/>
+      <ellipse cx="57" cy="47" rx="5.5" ry="5.8" fill="#1C1B2E"/>
+      <circle cx="59.5" cy="44.5" r="1.8" fill="white"/>
+      {/* thought cloud dots */}
+      <circle cx="75" cy="32" r="2.2" fill="#94A3B8"/>
+      <circle cx="81" cy="25" r="2.8" fill="#CBD5E1"/>
+      <circle cx="88" cy="17" r="4" fill="#E2E8F0" opacity="0.7"/>
+    </>,
+    excited: <>
+      <ellipse cx="35" cy="46" rx="6.5" ry="7" fill="#1C1B2E"/>
+      <circle cx="38" cy="43" r="2.2" fill="white"/>
+      <ellipse cx="57" cy="46" rx="6.5" ry="7" fill="#1C1B2E"/>
+      <circle cx="60" cy="43" r="2.2" fill="white"/>
+      <text x="68" y="35" fontSize="9">✨</text>
+    </>,
+    loading: <>
+      <ellipse cx="35" cy="47" rx="5.5" ry="3.5" fill="#1C1B2E" style={{animation:'blink 1.2s ease-in-out infinite'}}/>
+      <ellipse cx="57" cy="47" rx="5.5" ry="3.5" fill="#1C1B2E" style={{animation:'blink 1.2s ease-in-out infinite 0.15s'}}/>
+    </>,
+    sad: <>
+      <ellipse cx="35" cy="49" rx="5" ry="5.5" fill="#1C1B2E"/>
+      <circle cx="37.5" cy="46.5" r="1.6" fill="white"/>
+      <ellipse cx="57" cy="49" rx="5" ry="5.5" fill="#1C1B2E"/>
+      <circle cx="59.5" cy="46.5" r="1.6" fill="white"/>
+    </>,
   }
 
-  const mouth = {
-    happy:    <path d="M38 57 Q45 63 52 57" stroke="#8b4513" strokeWidth="2" fill="none" strokeLinecap="round" />,
-    thinking: <path d="M40 58 Q45 56 50 58" stroke="#8b4513" strokeWidth="2" fill="none" strokeLinecap="round" />,
-    loading:  <path d="M40 59 Q45 59 50 59" stroke="#8b4513" strokeWidth="1.5" fill="none" strokeLinecap="round" />,
-    excited:  <path d="M37 56 Q45 65 53 56" stroke="#8b4513" strokeWidth="2.2" fill="none" strokeLinecap="round" />,
-    sad:      <path d="M40 60 Q45 56 50 60" stroke="#8b4513" strokeWidth="2" fill="none" strokeLinecap="round" />,
+  const mouths = {
+    happy:    <path d="M38 58 Q46 65 54 58" stroke="#7C4A2A" strokeWidth="2.2" fill="none" strokeLinecap="round"/>,
+    wink:     <path d="M39 58 Q46 65 54 58" stroke="#7C4A2A" strokeWidth="2.2" fill="none" strokeLinecap="round"/>,
+    thinking: <path d="M40 60 Q46 57 52 60" stroke="#7C4A2A" strokeWidth="2" fill="none" strokeLinecap="round"/>,
+    excited:  <path d="M37 57 Q46 67 55 57" stroke="#7C4A2A" strokeWidth="2.4" fill="none" strokeLinecap="round"/>,
+    loading:  <path d="M41 61 Q46 61 51 61" stroke="#7C4A2A" strokeWidth="1.8" fill="none" strokeLinecap="round"/>,
+    sad:      <path d="M40 63 Q46 58 52 63" stroke="#7C4A2A" strokeWidth="2" fill="none" strokeLinecap="round"/>,
   }
+
+  const currentMood = eyes[mood] ? mood : 'happy'
 
   return (
-    <div style={{ display: 'inline-block', ...floatAnim }}>
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 100 140"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* ── Body: Blue hoodie ── */}
-        <ellipse cx="50" cy="112" rx="30" ry="22" fill="#2563EB" />
-        {/* Hoodie center seam */}
-        <line x1="50" y1="90" x2="50" y2="128" stroke="#1D4ED8" strokeWidth="1.5" />
-        {/* Hoodie pocket */}
-        <rect x="35" y="108" width="30" height="16" rx="5" fill="#1D4ED8" opacity="0.5" />
-        {/* Hoodie icon: bar chart */}
-        <rect x="43" y="113" width="3" height="7" rx="1" fill="#60A5FA" />
-        <rect x="47.5" y="110" width="3" height="10" rx="1" fill="#60A5FA" />
-        <rect x="52" y="115" width="3" height="5" rx="1" fill="#60A5FA" />
+    <div style={floatStyle}>
+      <svg width={size} height={Math.round(size*1.42)} viewBox="0 0 100 142" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+        {/* ── Shadow ── */}
+        <ellipse cx="50" cy="138" rx="22" ry="4.5" fill="rgba(0,0,0,0.10)"/>
+
+        {/* ── Body: Hoodie ── */}
+        <ellipse cx="50" cy="116" rx="32" ry="24" fill={hoodieColor}/>
+        {/* Hood collar */}
+        <path d="M28 96 Q50 108 72 96" stroke={hoodieShade} strokeWidth="3" fill="none"/>
+        {/* Center zip line */}
+        <line x1="50" y1="96" x2="50" y2="132" stroke={hoodieShade} strokeWidth="1.5"/>
+        {/* Pocket */}
+        <rect x="33" y="112" width="34" height="18" rx="6" fill={hoodieShade} opacity="0.6"/>
+
+        {/* Chart icon on hoodie */}
+        <rect x="41" y="117" width="3.5" height="8" rx="1.2" fill="rgba(255,255,255,0.85)"/>
+        <rect x="46" y="113" width="3.5" height="12" rx="1.2" fill="rgba(255,255,255,0.85)"/>
+        <rect x="51" y="119" width="3.5" height="6" rx="1.2" fill="rgba(255,255,255,0.85)"/>
         {/* Arrow up */}
-        <path d="M57 114 L60 110 L63 114" stroke="#60A5FA" strokeWidth="1.5" fill="none" strokeLinejoin="round" />
-        <line x1="60" y1="110" x2="60" y2="117" stroke="#60A5FA" strokeWidth="1.5" />
+        <path d="M57 116 L60 112 L63 116" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8" fill="none" strokeLinejoin="round"/>
+        <line x1="60" y1="112" x2="60" y2="119" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8"/>
 
-        {/* Paws / arms */}
-        {/* Left arm holding clipboard */}
-        <ellipse cx="24" cy="105" rx="9" ry="6" fill="#2563EB" transform="rotate(-20 24 105)" />
-        <ellipse cx="17" cy="113" rx="7" ry="5" fill="#d4a06a" transform="rotate(-10 17 113)" />
+        {/* ── Left arm + clipboard ── */}
+        <ellipse cx="23" cy="108" rx="10" ry="7" fill={hoodieColor} transform="rotate(-25 23 108)"/>
+        {/* Paw */}
+        <ellipse cx="14" cy="118" rx="8" ry="6" fill="#D4A574"/>
+        <ellipse cx="11" cy="116" rx="2" ry="1.5" fill="#C49060"/>
+        <ellipse cx="13.5" cy="114" rx="2" ry="1.5" fill="#C49060"/>
+        <ellipse cx="16.5" cy="113.5" rx="2" ry="1.5" fill="#C49060"/>
         {/* Clipboard */}
-        <rect x="4" y="95" width="20" height="26" rx="3" fill="#e8d5b0" stroke="#c4a46a" strokeWidth="1" />
-        <rect x="8" y="93" width="12" height="5" rx="2" fill="#b8956a" />
-        <line x1="8" y1="103" x2="20" y2="103" stroke="#8b7355" strokeWidth="1" />
-        <line x1="8" y1="107" x2="20" y2="107" stroke="#8b7355" strokeWidth="1" />
-        <line x1="8" y1="111" x2="20" y2="111" stroke="#8b7355" strokeWidth="1" />
-        <line x1="8" y1="115" x2="16" y2="115" stroke="#8b7355" strokeWidth="1" />
+        <rect x="0" y="94" width="22" height="28" rx="3.5" fill="#E8D5A3" stroke="#C4A060" strokeWidth="1.2"/>
+        <rect x="7" y="92" width="13" height="6" rx="3" fill="#A08040"/>
+        <line x1="4" y1="104" x2="18" y2="104" stroke="#9C835A" strokeWidth="1.2"/>
+        <line x1="4" y1="108.5" x2="18" y2="108.5" stroke="#9C835A" strokeWidth="1.2"/>
+        <line x1="4" y1="113" x2="18" y2="113" stroke="#9C835A" strokeWidth="1.2"/>
+        <line x1="4" y1="117.5" x2="13" y2="117.5" stroke="#9C835A" strokeWidth="1.2"/>
 
-        {/* Right arm with pencil */}
-        <ellipse cx="76" cy="105" rx="9" ry="6" fill="#2563EB" transform="rotate(20 76 105)" />
-        <ellipse cx="82" cy="112" rx="7" ry="5" fill="#d4a06a" transform="rotate(10 82 112)" />
+        {/* ── Right arm + pencil ── */}
+        <ellipse cx="77" cy="108" rx="10" ry="7" fill={hoodieColor} transform="rotate(25 77 108)"/>
+        {/* Paw */}
+        <ellipse cx="86" cy="117" rx="8" ry="6" fill="#D4A574"/>
         {/* Pencil */}
-        <rect x="85" y="95" width="5" height="22" rx="1" fill="#FFD700" transform="rotate(15 85 95)" />
-        <polygon points="88,116 90,116 89,121" fill="#f97316" transform="rotate(15 89 118)" />
-        <rect x="85" y="95" width="5" height="4" rx="1" fill="#E2E8F0" transform="rotate(15 85 95)" />
+        <g transform="rotate(18 87 100)">
+          <rect x="84" y="93" width="6" height="25" rx="1.2" fill="#FFD700"/>
+          <rect x="84" y="93" width="6" height="5" rx="1.2" fill="#E8E8E8"/>
+          <polygon points="84,118 90,118 87,124" fill="#F97316"/>
+          <line x1="87" y1="118" x2="87" y2="124" stroke="#CC5500" strokeWidth="0.8"/>
+        </g>
+
+        {/* ── Coin stack ── */}
+        <ellipse cx="82" cy="133" rx="11" ry="4" fill="#B45309"/>
+        <ellipse cx="82" cy="129" rx="11" ry="4" fill="#D97706"/>
+        <ellipse cx="82" cy="125" rx="11" ry="4" fill="#F59E0B"/>
+        <ellipse cx="82" cy="122" rx="11" ry="4" fill="#FCD34D"/>
+        <text x="82" y="125.5" textAnchor="middle" fontSize="5.5" fontWeight="bold" fill="#92400E">¥</text>
 
         {/* ── Head ── */}
         {/* Ears */}
-        <polygon points="24,22 18,5 35,18" fill="#9ca3af" />
-        <polygon points="26,21 21,9 34,18" fill="#f9a8d4" opacity="0.7" />
-        <polygon points="76,22 82,5 65,18" fill="#9ca3af" />
-        <polygon points="74,21 79,9 66,18" fill="#f9a8d4" opacity="0.7" />
+        <polygon points="25,23 18,5 36,19" fill="#B0B8C5"/>
+        <polygon points="26,21 20,8 35,19" fill="#FBBFD0" opacity="0.8"/>
+        <polygon points="75,23 82,5 64,19" fill="#B0B8C5"/>
+        <polygon points="74,21 80,8 65,19" fill="#FBBFD0" opacity="0.8"/>
 
-        {/* Head base */}
-        <ellipse cx="50" cy="45" rx="28" ry="27" fill="#d1d5db" />
-
-        {/* Forehead fur gradient */}
-        <ellipse cx="50" cy="30" rx="20" ry="12" fill="#9ca3af" opacity="0.4" />
+        {/* Head */}
+        <ellipse cx="50" cy="46" rx="30" ry="29" fill="#D1D9E6"/>
+        {/* Fur texture top */}
+        <ellipse cx="50" cy="28" rx="22" ry="13" fill="#B8C2D4" opacity="0.45"/>
 
         {/* ── Glasses ── */}
-        {/* Left lens */}
-        <circle cx="34" cy="46" r="11" fill="none" stroke="#1a1a2e" strokeWidth="2.5" />
-        <circle cx="34" cy="46" r="11" fill="#bfdbfe" opacity="0.15" />
-        {/* Right lens */}
-        <circle cx="56" cy="46" r="11" fill="none" stroke="#1a1a2e" strokeWidth="2.5" />
-        <circle cx="56" cy="46" r="11" fill="#bfdbfe" opacity="0.15" />
+        {/* Left lens frame */}
+        <circle cx="35" cy="47" r="13" fill="rgba(191,219,254,0.18)" stroke="#1C1B2E" strokeWidth="2.8"/>
+        {/* Right lens frame */}
+        <circle cx="57" cy="47" r="13" fill="rgba(191,219,254,0.18)" stroke="#1C1B2E" strokeWidth="2.8"/>
         {/* Bridge */}
-        <path d="M45 46 Q50 43 55 46" stroke="#1a1a2e" strokeWidth="2" fill="none" />
-        {/* Left arm */}
-        <line x1="23" y1="44" x2="17" y2="43" stroke="#1a1a2e" strokeWidth="2" strokeLinecap="round" />
-        {/* Right arm */}
-        <line x1="67" y1="44" x2="73" y2="43" stroke="#1a1a2e" strokeWidth="2" strokeLinecap="round" />
+        <path d="M48 47 Q52 44 56 47" stroke="#1C1B2E" strokeWidth="2.2" fill="none"/>
+        {/* Left temple */}
+        <line x1="22" y1="45" x2="16" y2="43" stroke="#1C1B2E" strokeWidth="2.2" strokeLinecap="round"/>
+        {/* Right temple */}
+        <line x1="70" y1="45" x2="76" y2="43" stroke="#1C1B2E" strokeWidth="2.2" strokeLinecap="round"/>
+        {/* Lens glare */}
+        <path d="M27 40 Q30 37 33 40" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+        <path d="M49 40 Q52 37 55 40" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
 
         {/* ── Eyes (inside glasses) ── */}
-        {eyes[mood] || eyes.happy}
+        {eyes[currentMood]}
 
         {/* Nose */}
-        <ellipse cx="50" cy="54" rx="3" ry="2" fill="#f87171" />
+        <ellipse cx="46" cy="56" rx="3.2" ry="2.2" fill="#F87171"/>
 
         {/* Mouth */}
-        {mouth[mood] || mouth.happy}
-
-        {/* Whiskers left */}
-        <line x1="14" y1="53" x2="32" y2="55" stroke="#6b7280" strokeWidth="0.8" opacity="0.6" />
-        <line x1="14" y1="57" x2="32" y2="57" stroke="#6b7280" strokeWidth="0.8" opacity="0.6" />
-        {/* Whiskers right */}
-        <line x1="68" y1="55" x2="86" y2="53" stroke="#6b7280" strokeWidth="0.8" opacity="0.6" />
-        <line x1="68" y1="57" x2="86" y2="57" stroke="#6b7280" strokeWidth="0.8" opacity="0.6" />
+        {mouths[currentMood]}
 
         {/* Blush */}
-        <ellipse cx="24" cy="60" rx="6" ry="3.5" fill="#fca5a5" opacity="0.45" />
-        <ellipse cx="76" cy="60" rx="6" ry="3.5" fill="#fca5a5" opacity="0.45" />
+        <ellipse cx="24" cy="62" rx="7" ry="4" fill="#FCA5A5" opacity="0.4"/>
+        <ellipse cx="76" cy="62" rx="7" ry="4" fill="#FCA5A5" opacity="0.4"/>
 
-        {/* Coin stack */}
-        <ellipse cx="78" cy="128" rx="10" ry="4" fill="#ca8a04" />
-        <ellipse cx="78" cy="124" rx="10" ry="4" fill="#eab308" />
-        <ellipse cx="78" cy="120" rx="10" ry="4" fill="#fbbf24" />
-        <text x="78" y="123" textAnchor="middle" fontSize="5" fontWeight="bold" fill="#92400e">¥</text>
+        {/* Whiskers */}
+        <line x1="10" y1="55" x2="30" y2="57" stroke="#64748B" strokeWidth="0.9" opacity="0.55"/>
+        <line x1="10" y1="59" x2="30" y2="59" stroke="#64748B" strokeWidth="0.9" opacity="0.55"/>
+        <line x1="70" y1="57" x2="90" y2="55" stroke="#64748B" strokeWidth="0.9" opacity="0.55"/>
+        <line x1="70" y1="59" x2="90" y2="59" stroke="#64748B" strokeWidth="0.9" opacity="0.55"/>
       </svg>
     </div>
   )
