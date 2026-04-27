@@ -1,45 +1,20 @@
-/**
- * sheetsService.js
- * ─────────────────────────────────────────────────────────────────
- * Backend: Google Apps Script Web App (deployed as "Anyone" access)
- *
- * HOW TO SET UP (ทำครั้งเดียว):
- * 1. เปิด Google Sheet ใหม่
- * 2. Extensions → Apps Script
- * 3. วางโค้ด Google Apps Script จาก README.md
- * 4. Deploy → New Deployment → Web App
- *    - Execute as: Me
- *    - Who has access: Anyone
- * 5. Copy "Web app URL" แล้วใส่ใน SHEET_URL ด้านล่าง
- * ─────────────────────────────────────────────────────────────────
- */
+// sheetsService.js — Google Apps Script Web App backend
 
-// ⚠️ ใส่ URL ของ Google Apps Script Web App ของคุณที่นี่
 const SHEET_URL = import.meta.env.VITE_SHEET_URL || ''
 
-const HEADERS = ['id', 'date', 'amount', 'category', 'note', 'source', 'createdAt']
+export function isSheetConfigured() {
+  return Boolean(SHEET_URL && SHEET_URL.startsWith('https://'))
+}
 
-/**
- * Generic fetch wrapper with timeout + CORS handling
- */
 async function sheetFetch(params) {
-  if (!SHEET_URL) {
-    throw new Error('NO_URL')
-  }
-
+  if (!SHEET_URL) throw new Error('NO_URL')
   const url = new URL(SHEET_URL)
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
-
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10000)
-
   try {
-    const res = await fetch(url.toString(), {
-      method: 'GET',
-      signal: controller.signal,
-    })
+    const res = await fetch(url.toString(), { method: 'GET', signal: controller.signal })
     clearTimeout(timeout)
-
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = await res.json()
     if (data.error) throw new Error(data.error)
@@ -50,54 +25,6 @@ async function sheetFetch(params) {
     throw err
   }
 }
-
-/**
- * Load all transactions from Google Sheet
- * @returns {Promise<Array>}
- */
-export async function loadTransactions() {
-  const data = await sheetFetch({ action: 'getAll' })
-  return (data.rows || []).map(rowToTx).filter(Boolean)
-}
-
-/**
- * Save a single transaction to Google Sheet
- * @param {Object} tx
- * @returns {Promise<Object>}
- */
-export async function saveTransaction(tx) {
-  const row = txToRow(tx)
-  const data = await sheetFetch({
-    action: 'append',
-    row: JSON.stringify(row),
-  })
-  return data
-}
-
-/**
- * Save multiple transactions in one batch
- * @param {Array} txList
- * @returns {Promise<Object>}
- */
-export async function saveTransactions(txList) {
-  const rows = txList.map(txToRow)
-  const data = await sheetFetch({
-    action: 'appendBatch',
-    rows: JSON.stringify(rows),
-  })
-  return data
-}
-
-/**
- * Delete a transaction by id
- * @param {string} id
- */
-export async function deleteTransaction(id) {
-  const data = await sheetFetch({ action: 'delete', id })
-  return data
-}
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 function txToRow(tx) {
   return {
@@ -126,9 +53,15 @@ function rowToTx(row) {
   }
 }
 
-/**
- * Check if Google Sheet is configured
- */
-export function isSheetConfigured() {
-  return Boolean(SHEET_URL && SHEET_URL.startsWith('https://'))
+export async function loadTransactions() {
+  const data = await sheetFetch({ action: 'getAll' })
+  return (data.rows || []).map(rowToTx).filter(Boolean)
+}
+
+export async function saveTransaction(tx) {
+  return sheetFetch({ action: 'append', row: JSON.stringify(txToRow(tx)) })
+}
+
+export async function deleteTransaction(id) {
+  return sheetFetch({ action: 'delete', id })
 }

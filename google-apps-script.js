@@ -1,148 +1,65 @@
 /**
- * ═══════════════════════════════════════════════════════
- *  MoneyPaw — Google Apps Script Backend
- *  วางโค้ดนี้ทั้งหมดใน Google Apps Script แล้ว Deploy
- * ═══════════════════════════════════════════════════════
+ * Personal Finance — Google Apps Script Backend
+ * วางโค้ดนี้ใน Google Apps Script แล้ว Deploy เป็น Web App
  *
- *  วิธี Deploy:
- *  1. เปิด Google Sheet → Extensions → Apps Script
- *  2. ลบโค้ดเดิมทั้งหมด แล้ว paste โค้ดนี้
- *  3. Deploy → New Deployment
- *     - Type: Web App
- *     - Execute as: Me
- *     - Who has access: Anyone
- *  4. Copy "Web app URL" → ใส่ใน .env ของ project
+ * Deploy settings:
+ *   Execute as: Me
+ *   Who has access: Anyone
  */
 
 const SHEET_NAME = 'Transactions'
-const HEADERS    = ['id', 'date', 'amount', 'category', 'note', 'source', 'createdAt']
-
-// ─── CORS Headers ────────────────────────────────────────────────────────────
-
-function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  }
-}
-
-function jsonResponse(data, code) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON)
-}
-
-// ─── Get or Create Sheet ──────────────────────────────────────────────────────
+const HEADERS    = ['id','date','amount','category','note','source','createdAt']
 
 function getSheet() {
-  const ss    = SpreadsheetApp.getActiveSpreadsheet()
-  let   sheet = ss.getSheetByName(SHEET_NAME)
-
-  if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME)
-    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
-    sheet.getRange(1, 1, 1, HEADERS.length)
-      .setBackground('#1A1A2E')
-      .setFontColor('#F9C74F')
-      .setFontWeight('bold')
-    sheet.setFrozenRows(1)
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  let sh   = ss.getSheetByName(SHEET_NAME)
+  if (!sh) {
+    sh = ss.insertSheet(SHEET_NAME)
+    sh.getRange(1,1,1,HEADERS.length).setValues([HEADERS])
+    sh.getRange(1,1,1,HEADERS.length).setBackground('#2563EB').setFontColor('#fff').setFontWeight('bold')
+    sh.setFrozenRows(1)
   }
-
-  return sheet
+  return sh
 }
 
-// ─── Actions ──────────────────────────────────────────────────────────────────
-
-function getAllRows() {
-  const sheet = getSheet()
-  const data  = sheet.getDataRange().getValues()
-
-  if (data.length <= 1) return { rows: [] }
-
-  const headers = data[0]
-  const rows    = data.slice(1).map(row => {
-    const obj = {}
-    headers.forEach((h, i) => { obj[h] = row[i] })
-    return obj
-  }).filter(row => row.id && row.id !== '')
-
-  return { rows }
+function jsonOut(data) {
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON)
 }
-
-function appendRow(rowData) {
-  if (!rowData || typeof rowData !== 'object') {
-    return { error: 'Invalid row data' }
-  }
-  const sheet  = getSheet()
-  const values = HEADERS.map(h => rowData[h] !== undefined ? rowData[h] : '')
-  sheet.appendRow(values)
-  return { success: true, id: rowData.id }
-}
-
-function appendBatchRows(rowsData) {
-  if (!Array.isArray(rowsData) || rowsData.length === 0) {
-    return { error: 'Invalid rows data' }
-  }
-  const sheet    = getSheet()
-  const allValues = rowsData.map(row => HEADERS.map(h => row[h] !== undefined ? row[h] : ''))
-  const startRow  = sheet.getLastRow() + 1
-  sheet.getRange(startRow, 1, allValues.length, HEADERS.length).setValues(allValues)
-  return { success: true, count: rowsData.length }
-}
-
-function deleteRow(id) {
-  if (!id) return { error: 'No id provided' }
-
-  const sheet     = getSheet()
-  const data      = sheet.getDataRange().getValues()
-  const idColIdx  = HEADERS.indexOf('id')
-
-  for (let i = data.length - 1; i >= 1; i--) {
-    if (String(data[i][idColIdx]) === String(id)) {
-      sheet.deleteRow(i + 1)
-      return { success: true }
-    }
-  }
-  return { error: 'Row not found' }
-}
-
-// ─── Entry Point ──────────────────────────────────────────────────────────────
 
 function doGet(e) {
   try {
-    const params = e.parameter || {}
-    const action = params.action || ''
+    const p  = e.parameter || {}
+    const sh = getSheet()
 
-    let result
-
-    if (action === 'getAll') {
-      result = getAllRows()
-
-    } else if (action === 'append') {
-      const row = JSON.parse(params.row || '{}')
-      result    = appendRow(row)
-
-    } else if (action === 'appendBatch') {
-      const rows = JSON.parse(params.rows || '[]')
-      result     = appendBatchRows(rows)
-
-    } else if (action === 'delete') {
-      result = deleteRow(params.id)
-
-    } else {
-      result = { error: 'Unknown action: ' + action }
+    if (p.action === 'getAll') {
+      const vals = sh.getDataRange().getValues()
+      if (vals.length <= 1) return jsonOut({ rows: [] })
+      const hdrs = vals[0]
+      const rows = vals.slice(1)
+        .map(r => { const o={}; hdrs.forEach((h,i)=>{ o[h]=r[i] }); return o })
+        .filter(r => r.id && r.id !== '')
+      return jsonOut({ rows })
     }
 
-    return jsonResponse(result)
+    if (p.action === 'append') {
+      const row = JSON.parse(p.row || '{}')
+      sh.appendRow(HEADERS.map(h => row[h] !== undefined ? row[h] : ''))
+      return jsonOut({ success: true })
+    }
 
-  } catch (err) {
-    return jsonResponse({ error: err.message || 'Internal error' })
+    if (p.action === 'delete') {
+      const vals   = sh.getDataRange().getValues()
+      const idCol  = HEADERS.indexOf('id')
+      for (let i = vals.length - 1; i >= 1; i--) {
+        if (String(vals[i][idCol]) === String(p.id)) { sh.deleteRow(i+1); return jsonOut({ success: true }) }
+      }
+      return jsonOut({ error: 'not found' })
+    }
+
+    return jsonOut({ error: 'unknown action' })
+  } catch(err) {
+    return jsonOut({ error: err.message })
   }
 }
 
-// Required for preflight OPTIONS — Google Apps Script handles this automatically
-// but we add this for clarity
-function doPost(e) {
-  return doGet(e)
-}
+function doPost(e) { return doGet(e) }
